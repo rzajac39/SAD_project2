@@ -23,11 +23,17 @@ def generate_raport(clf, X_train, X_test, y_train, y_test, get_frame=False) -> U
 
         
         predictions = clf.predict(X_test)
+        
         precision = precision_score(y_test, predictions)
         recall = recall_score(y_test, predictions)
         f1 = f1_score(y_test, predictions)
         accuracy = accuracy_score(y_test, predictions)
-        roc_auc = roc_auc_score(y_test, predictions)
+        # roc_auc = roc_auc_score(y_test, predictions)
+
+        probas = clf.predict_proba(X_test)
+        fpr, tpr, _ = roc_curve(y_test, probas[:,1])
+        roc_auc = auc(fpr, tpr)
+        
         
         if get_frame:
             tmp = {
@@ -35,7 +41,8 @@ def generate_raport(clf, X_train, X_test, y_train, y_test, get_frame=False) -> U
             "Recall": recall,
             "F1 Score": f1,
             "Accuracy": accuracy,
-            "Roc_auc_score": roc_auc}
+            "Roc_auc_score": roc_auc
+            }
             return pd.DataFrame.from_dict(tmp, orient = 'index').T
         
         print('Model test:')
@@ -43,4 +50,6 @@ def generate_raport(clf, X_train, X_test, y_train, y_test, get_frame=False) -> U
                 \n\t\t Rec: {recall} \
                 \n\t\t F1: {f1} \
                 \n\t\t Acc: {accuracy} \
-                \n\t\t ROC_AUC: {roc_auc}')
+                \n\t\t ROC_AUC: {roc_auc} \
+                ')
+                
